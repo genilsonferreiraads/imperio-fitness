@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Player de Áudio Automático com YouTube</title>
     <style>
-        /* O CSS permanece o mesmo */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
@@ -158,7 +157,7 @@
             </div>
 
             <div class="audio-box">
-                <div class="audio-title">Aviso, 10 minutos para Fechar Academia</div>
+                <div class="audio-title">Encerramento das Atividades</div>
                 <audio id="audioPlayer2" class="audio-player" controls>
                     <source src="audios/encerramento das atividades.mp3" type="audio/mpeg">
                     Seu navegador não suporta o elemento de áudio.
@@ -204,23 +203,17 @@
         let overlayTimeoutId;
         let isAudio2Playing = false;
 
-        function initYouTubePlayer() {
-            const savedVideoId = localStorage.getItem('youtubeVideoId');
-            if (savedVideoId) {
-                createYouTubePlayer(savedVideoId);
-                youtubeLinkInput.value = `https://www.youtube.com/watch?v=${savedVideoId}`;
-            }
+        const savedVideoId = localStorage.getItem('youtubeVideoId');
+        if (savedVideoId) {
+            createYouTubePlayer(savedVideoId);
+            youtubeLinkInput.value = `https://www.youtube.com/watch?v=${savedVideoId}`;
         }
 
         function saveState() {
             localStorage.setItem('interval', interval);
             localStorage.setItem('remainingTime', remainingTime);
-            localStorage.setItem('intervalInputValue', intervalInput.value);
-            if (youtubePlayer && youtubePlayer.getVideoData) {
-                const videoData = youtubePlayer.getVideoData();
-                if (videoData && videoData.video_id) {
-                    localStorage.setItem('youtubeVideoId', videoData.video_id);
-                }
+            if (youtubePlayer) {
+                localStorage.setItem('youtubeVideoId', youtubePlayer.getVideoData().video_id);
             }
         }
 
@@ -398,23 +391,13 @@
         document.getElementById('youtubePlayer').addEventListener('mousemove', startOverlayTimer);
         document.getElementById('youtubePlayer').addEventListener('mouseleave', startOverlayTimer);
 
-        // Carregar o valor salvo do intervalo
-        const savedIntervalInputValue = localStorage.getItem('intervalInputValue');
-        if (savedIntervalInputValue) {
-            intervalInput.value = savedIntervalInputValue;
-            interval = parseInt(savedIntervalInputValue) * 60000;
-        }
-
         resetTimeout();
 
         setInterval(saveState, 1000);
 
         function onYouTubeIframeAPIReady() {
-            initYouTubePlayer();
+            // A API está pronta
         }
-
-        // Inicializar o player do YouTube quando a página carregar
-        window.addEventListener('load', initYouTubePlayer);
     </script>
 </body>
 </html>
