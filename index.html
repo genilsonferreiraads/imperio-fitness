@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Player de Áudio Automático com YouTube</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #121212;
+            color: #ffffff;
+        }
+        .container {
+            display: flex;
+            background-color: #1e1e1e;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+            width: 900px;
+            gap: 30px;
+        }
+        .left-column, .right-column {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .audio-box {
+            background-color: #2c2c2c;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .timer-display {
+            font-size: 3em;
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: bold;
+            color: #FFA500;
+        }
+        .audio-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #FFA500;
+        }
+        .audio-player {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #BBBBBB;
+        }
+        input[type="number"], input[type="text"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            border: none;
+            background-color: #3c3c3c;
+            color: #ffffff;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        input[type="number"] {
+            width: 60px;
+            -moz-appearance: textfield;
+        }
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        button {
+            background-color: #FFA500;
+            color: black;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #FF8C00;
+        }
+        #youtubePlayer {
+            width: 100%;
+            height: 315px;
+            margin-top: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+        #youtubeOverlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 165, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            color: white;
+        }
+        .sound-wave {
+            width: 100px;
+            height: 100px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+        .sound-wave span {
+            width: 10px;
+            background-color: #FFA500;
+            animation: sound-wave 1.5s infinite ease-in-out;
+        }
+        .sound-wave span:nth-child(2) { animation-delay: 0.2s; }
+        .sound-wave span:nth-child(3) { animation-delay: 0.4s; }
+        .sound-wave span:nth-child(4) { animation-delay: 0.6s; }
+        .sound-wave span:nth-child(5) { animation-delay: 0.8s; }
+        @keyframes sound-wave {
+            0%, 100% { height: 10px; }
+            50% { height: 100px; }
+        }
+        #errorMessage {
+            color: #ff6b6b;
+            margin-top: 10px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="left-column">
+            <div class="audio-box">
+                <div class="timer-display" id="timer"></div>
+                <div class="audio-title">Aviso dos Pesos</div>
+                <audio id="audioPlayer" class="audio-player" controls>
+                    <source src="audios/audio alunos imperio.mp3" type="audio/mpeg">
+                    Seu navegador não suporta o elemento de áudio.
+                </audio>
+                <div class="input-group">
+                    <label for="intervalInput">Intervalo de reprodução (minutos):</label>
+                    <input type="number" id="intervalInput" min="1" value="2" step="1">
+                    <button onclick="updateInterval()">Atualizar</button>
+                </div>
+            </div>
+
+            <div class="audio-box">
+                <div class="audio-title">Encerramento das Atividades</div>
+                <audio id="audioPlayer2" class="audio-player" controls>
+                    <source src="audios/encerramento das atividades.mp3" type="audio/mpeg">
+                    Seu navegador não suporta o elemento de áudio.
+                </audio>
+            </div>
+        </div>
+        
+        <div class="right-column">
+            <div class="input-group">
+                <label for="youtubeLink">Link do YouTube:</label>
+                <input type="text" id="youtubeLink" placeholder="Cole o link do YouTube aqui" onclick="clearLinkField()">
+                <button onclick="loadYouTubeVideo()">Carregar Vídeo</button>
+            </div>
+            
+            <div id="youtubePlayer">
+                <div id="youtubeOverlay">
+                    <div class="sound-wave">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+            </div>
+            <div id="errorMessage"></div>
+        </div>
+    </div>
+
+    <script src="https://www.youtube.com/iframe_api"></script>
+    <script>
+        const audioPlayer = document.getElementById('audioPlayer');
+        const audioPlayer2 = document.getElementById('audioPlayer2');
+        const intervalInput = document.getElementById('intervalInput');
+        const timerDisplay = document.getElementById('timer');
+        const youtubeLinkInput = document.getElementById('youtubeLink');
+        const youtubeOverlay = document.getElementById('youtubeOverlay');
+        let interval = parseInt(localStorage.getItem('interval')) || 120000;
+        let timeoutId;
+        let countdownInterval;
+        let remainingTime = parseInt(localStorage.getItem('remainingTime')) || interval;
+        let youtubePlayer;
+        let overlayTimeoutId;
+        let isAudio2Playing = false;
+
+        const savedVideoId = localStorage.getItem('youtubeVideoId');
+        if (savedVideoId) {
+            createYouTubePlayer(savedVideoId);
+            youtubeLinkInput.value = `https://www.youtube.com/watch?v=${savedVideoId}`;
+        }
+
+        function saveState() {
+            localStorage.setItem('interval', interval);
+            localStorage.setItem('remainingTime', remainingTime);
+            if (youtubePlayer) {
+                localStorage.setItem('youtubeVideoId', youtubePlayer.getVideoData().video_id);
+            }
+        }
+
+        function updateInterval() {
+            const minutes = parseInt(intervalInput.value);
+            if (minutes > 0) {
+                interval = minutes * 60000;
+                remainingTime = interval;
+                saveState();
+                resetTimeout();
+            }
+        }
+
+        function playAudio() {
+            if (isAudio2Playing) {
+                remainingTime = 60000; // 1 minuto de atraso
+                updateTimerDisplay(remainingTime);
+                timeoutId = setTimeout(() => {
+                    audioPlayer.currentTime = 0;
+                    audioPlayer.play();
+                    if (youtubePlayer && youtubePlayer.getPlayerState() === YT.PlayerState.PLAYING) {
+                        youtubePlayer.setVolume(20);
+                    }
+                }, 60000);
+            } else {
+                audioPlayer.currentTime = 0;
+                audioPlayer.play();
+                if (youtubePlayer && youtubePlayer.getPlayerState() === YT.PlayerState.PLAYING) {
+                    youtubePlayer.setVolume(20);
+                }
+            }
+        }
+
+        function resetTimeout() {
+            clearTimeout(timeoutId);
+            clearInterval(countdownInterval);
+            timeoutId = setTimeout(playAudio, remainingTime);
+            startCountdown();
+        }
+
+        function startCountdown() {
+            updateTimerDisplay(remainingTime);
+            countdownInterval = setInterval(() => {
+                remainingTime -= 1000;
+                if (remainingTime < 0) {
+                    clearInterval(countdownInterval);
+                    remainingTime = interval;
+                    resetTimeout();
+                } else {
+                    updateTimerDisplay(remainingTime);
+                }
+                saveState();
+            }, 1000);
+        }
+
+        function updateTimerDisplay(time) {
+            const minutes = Math.floor(time / 60000);
+            const seconds = Math.floor((time % 60000) / 1000);
+            timerDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function loadYouTubeVideo() {
+            const youtubeUrl = youtubeLinkInput.value;
+            const videoId = extractVideoId(youtubeUrl);
+            if (videoId) {
+                if (youtubePlayer) {
+                    youtubePlayer.loadVideoById(videoId);
+                } else {
+                    createYouTubePlayer(videoId);
+                }
+                localStorage.setItem('youtubeVideoId', videoId);
+            } else {
+                showError('URL do YouTube inválida');
+            }
+        }
+
+        function createYouTubePlayer(videoId) {
+            youtubePlayer = new YT.Player('youtubePlayer', {
+                height: '315',
+                width: '100%',
+                videoId: videoId,
+                events: {
+                    'onReady': onYouTubePlayerReady,
+                    'onError': onYouTubePlayerError,
+                    'onStateChange': onYouTubePlayerStateChange
+                }
+            });
+        }
+
+        function onYouTubePlayerReady(event) {
+            event.target.playVideo();
+            hideError();
+            startOverlayTimer();
+        }
+
+        function onYouTubePlayerError(event) {
+            showError('Erro ao carregar o vídeo do YouTube. Código de erro: ' + event.data);
+        }
+
+        function onYouTubePlayerStateChange(event) {
+            if (event.data === YT.PlayerState.PLAYING && audioPlayer.paused && !isAudio2Playing) {
+                youtubePlayer.setVolume(100);
+            }
+        }
+
+        function extractVideoId(url) {
+            const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[7].length === 11) ? match[7] : false;
+        }
+
+        function showError(message) {
+            document.getElementById('errorMessage').textContent = message;
+        }
+
+        function hideError() {
+            document.getElementById('errorMessage').textContent = '';
+        }
+
+        function clearLinkField() {
+            youtubeLinkInput.value = '';
+        }
+
+        function startOverlayTimer() {
+            clearTimeout(overlayTimeoutId);
+            youtubeOverlay.style.display = 'none';
+            overlayTimeoutId = setTimeout(() => {
+                youtubeOverlay.style.display = 'flex';
+            }, 3000);
+        }
+
+        audioPlayer.addEventListener('play', () => {
+            resetTimeout();
+            if (youtubePlayer && youtubePlayer.getPlayerState() === YT.PlayerState.PLAYING) {
+                youtubePlayer.setVolume(20);
+            }
+        });
+
+        audioPlayer.addEventListener('pause', () => {
+            saveState();
+            if (youtubePlayer && youtubePlayer.getPlayerState() === YT.PlayerState.PLAYING) {
+                youtubePlayer.setVolume(100);
+            }
+        });
+
+        audioPlayer.addEventListener('ended', () => {
+            remainingTime = interval;
+            resetTimeout();
+            if (youtubePlayer && youtubePlayer.getPlayerState() === YT.PlayerState.PLAYING) {
+                youtubePlayer.setVolume(100);
+            }
+        });
+
+        audioPlayer2.addEventListener('play', () => {
+            isAudio2Playing = true;
+            if (youtubePlayer && youtubePlayer.getPlayerState() === YT.PlayerState.PLAYING) {
+                youtubePlayer.setVolume(20);
+            }
+        });
+
+        audioPlayer2.addEventListener('pause', () => {
+            isAudio2Playing = false;
+            if (youtubePlayer && youtubePlayer.getPlayerState() === YT.PlayerState.PLAYING) {
+                youtubePlayer.setVolume(100);
+            }
+        });
+
+        audioPlayer2.addEventListener('ended', () => {
+            isAudio2Playing = false;
+            if (youtubePlayer && youtubePlayer.getPlayerState() === YT.PlayerState.PLAYING) {
+                youtubePlayer.setVolume(100);
+            }
+        });
+
+        document.getElementById('youtubePlayer').addEventListener('mousemove', startOverlayTimer);
+        document.getElementById('youtubePlayer').addEventListener('mouseleave', startOverlayTimer);
+
+        resetTimeout();
+
+        setInterval(saveState, 1000);
+
+        function onYouTubeIframeAPIReady() {
+            // A API está pronta
+        }
+    </script>
+</body>
+</html>
