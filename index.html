@@ -8,7 +8,6 @@
     <title>Império Fitness</title>
     <style>
         body {
-
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
             flex-direction: column;
@@ -70,6 +69,34 @@
         .audio-player {
             width: 100%;
             margin-bottom: 20px;
+        }
+
+        #savedTextsList li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #3c3c3c;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        #savedTextsList li span {
+            cursor: pointer;
+            flex-grow: 1;
+        }
+
+        .delete-text {
+            background-color: transparent;
+            border: none;
+            color: #FFA500;
+            cursor: pointer;
+            font-size: 1.2em;
+            padding: 0 5px;
+        }
+
+        .delete-text:hover {
+            color: #FF8C00;
         }
 
         .input-group {
@@ -190,11 +217,9 @@
             text-align: center;
         }
 
-        .Custom-audio-section-title{
-            
+        .Custom-audio-section-title {
             color: #FF8C00;
         }
-
 
         #customAudiosSection {
             margin-top: 30px;
@@ -267,6 +292,80 @@
         .delete-audio:hover {
             background-color: #FF8C00;
         }
+
+        /* Estilos para a nova seção de texto para áudio */
+        #textToSpeechSection {
+            margin-top: 30px;
+            margin-bottom: 40px;
+            width: 900px;
+            background-color: #1e1e1e;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+        }
+
+        #textToSpeechSection h2 {
+            color: #FF8C00;
+            margin-bottom: 20px;
+        }
+
+        #text-input {
+            width: 100%;
+            height: 100px;
+            padding: 10px;
+            font-size: 16px;
+            border: none;
+            background-color: #3c3c3c;
+            color: #ffffff;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            resize: vertical;
+        }
+
+        #textToSpeechSection button {
+            background-color: #FFA500;
+            color: black;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-right: 10px;
+        }
+
+        #textToSpeechSection button:hover {
+            background-color: #FF8C00;
+        }
+
+        #textToSpeechSection audio {
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        #savedTextsSection {
+            margin-top: 20px;
+            background-color: #2c2c2c;
+            border-radius: 10px;
+            padding: 20px;
+            display: none;
+        }
+
+        #savedTextsList {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        #savedTextsList li {
+            background-color: #3c3c3c;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #savedTextsList li:hover {
+            background-color: #4c4c4c;
+        }
     </style>
 </head>
 
@@ -322,9 +421,19 @@
             </div>
         </div>
     </div>
-    </div>
-    </div>
-    </div>
+
+    <!-- Nova seção de Texto para Áudio -->
+    <div id="textToSpeechSection">
+        <h2>Digite o texto para falar</h2>
+        <textarea id="text-input" placeholder="Digite o texto aqui..."></textarea>
+        <button onclick="textToSpeech()">Falar Texto</button>
+        <button onclick="saveText()">Salvar Texto</button>
+        <button onclick="toggleSavedTexts()">Textos Salvos</button>
+        <audio id="audio-output" controls></audio>
+        <div id="savedTextsSection">
+            <h3>Textos Salvos</h3>
+            <ul id="savedTextsList"></ul>
+        </div>
     </div>
 
     <!-- Seção Separada para Áudios Personalizados -->
@@ -339,8 +448,6 @@
         </div>
         <div id="customAudiosList"></div>
     </div>
-    </div>
-
 
     <script src="https://www.youtube.com/iframe_api"></script>
     <script>
@@ -351,6 +458,7 @@
         const youtubeLinkInput = document.getElementById('youtubeLink');
         const youtubeOverlay = document.getElementById('youtubeOverlay');
         const customAudiosList = document.getElementById('customAudiosList');
+        const textToSpeechAudio = document.getElementById('audio-output');
         let interval = parseInt(localStorage.getItem('interval')) || 120000;
         let timeoutId;
         let countdownInterval;
@@ -360,9 +468,10 @@
         let isAudio2Playing = false;
         let customAudios = [];
         let db;
+        let isTextToSpeechPlaying = false;
 
         function initIndexedDB() {
-            const request = indexedDB.open('CustomAudiosDB', 1);
+            const request = indexedDB.open('CustomAudiosDB', 2);
 
             request.onerror = function (event) {
                 console.error("Erro ao abrir o banco de dados:", event.target.error);
@@ -371,12 +480,19 @@
             request.onsuccess = function (event) {
                 db = event.target.result;
                 loadCustomAudios();
+                loadSavedTexts();
             };
 
             request.onupgradeneeded = function (event) {
                 db = event.target.result;
-                const objectStore = db.createObjectStore('customAudios', { keyPath: 'id', autoIncrement: true });
-                objectStore.createIndex('title', 'title', { unique: false });
+                if (!db.objectStoreNames.contains('customAudios')) {
+                    const objectStore = db.createObjectStore('customAudios', { keyPath: 'id', autoIncrement: true });
+                    objectStore.createIndex('title', 'title', { unique: false });
+                }
+                if (!db.objectStoreNames.contains('savedTexts')) {
+                    const savedTextsStore = db.createObjectStore('savedTexts', { keyPath: 'id', autoIncrement: true });
+                    savedTextsStore.createIndex('text', 'text', { unique: false });
+                }
             };
         }
 
@@ -432,15 +548,15 @@
                 const audioBox = document.createElement('div');
                 audioBox.className = 'custom-audio-box';
                 audioBox.innerHTML = `
-                    <div class="custom-audio-title">${audio.title}</div>
-                    <audio controls>
-                        <source src="${audio.audioData}" type="audio/mpeg">
-                        Seu navegador não suporta o elemento de áudio.
-                    </audio>
-                    <div class="custom-audio-controls">
-                        <button class="delete-audio" onclick="deleteCustomAudio(${audio.id})">Excluir</button>
-                    </div>
-                `;
+                <div class="custom-audio-title">${audio.title}</div>
+                <audio controls>
+                    <source src="${audio.audioData}" type="audio/mpeg">
+                    Seu navegador não suporta o elemento de áudio.
+                </audio>
+                <div class="custom-audio-controls">
+                    <button class="delete-audio" onclick="deleteCustomAudio(${audio.id})">Excluir</button>
+                </div>
+            `;
                 const audioElement = audioBox.querySelector('audio');
                 audioElement.addEventListener('play', () => {
                     if (youtubePlayer && youtubePlayer.getPlayerState() === YT.PlayerState.PLAYING) {
@@ -507,7 +623,17 @@
         }
 
         function playAudio() {
-            if (isAudio2Playing) {
+            if (isTextToSpeechPlaying) {
+                remainingTime = 60000; // 1 minuto de atraso
+                updateTimerDisplay(remainingTime);
+                timeoutId = setTimeout(() => {
+                    audioPlayer.currentTime = 0;
+                    audioPlayer.play();
+                    if (youtubePlayer && youtubePlayer.getPlayerState() === YT.PlayerState.PLAYING) {
+                        youtubePlayer.setVolume(20);
+                    }
+                }, 60000);
+            } else if (isAudio2Playing) {
                 remainingTime = 60000; // 1 minuto de atraso
                 updateTimerDisplay(remainingTime);
                 timeoutId = setTimeout(() => {
@@ -593,7 +719,7 @@
         }
 
         function onYouTubePlayerStateChange(event) {
-            if (event.data === YT.PlayerState.PLAYING && audioPlayer.paused && !isAudio2Playing) {
+            if (event.data === YT.PlayerState.PLAYING && audioPlayer.paused && !isAudio2Playing && !isTextToSpeechPlaying) {
                 youtubePlayer.setVolume(100);
             }
         }
@@ -689,6 +815,149 @@
         window.addEventListener('load', () => {
             initYouTubePlayer();
             initIndexedDB();
+        });
+
+        // Função para converter texto em áudio
+        async function textToSpeech() {
+            const apiKey = 'AIzaSyD1KBlpAV71woravSlYcbimE5Sk7q8b8Bw';
+            const text = document.getElementById('text-input').value;
+            const url = `https://texttospeech.googleapis.com/v1/text:synthesize?key=${apiKey}`;
+
+            const data = {
+                input: { text: text },
+                voice: { languageCode: 'pt-BR', name: 'pt-BR-Wavenet-A', ssmlGender: 'FEMALE' },
+                audioConfig: { audioEncoding: 'MP3' }
+            };
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+                const audioContent = result.audioContent;
+
+                if (audioContent) {
+                    const audio = document.getElementById('audio-output');
+                    audio.src = `data:audio/mp3;base64,${audioContent}`;
+                    audio.play();
+                    isTextToSpeechPlaying = true;
+                    if (youtubePlayer && youtubePlayer.getPlayerState() === YT.PlayerState.PLAYING) {
+                        youtubePlayer.setVolume(20);
+                    }
+                    audio.addEventListener('ended', () => {
+                        isTextToSpeechPlaying = false;
+                        if (youtubePlayer && youtubePlayer.getPlayerState() === YT.PlayerState.PLAYING) {
+                            youtubePlayer.setVolume(100);
+                        }
+                    });
+                } else {
+                    alert('Erro ao gerar o áudio.');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+
+            }
+        }
+
+        function saveText() {
+            const text = document.getElementById('text-input').value;
+            if (text.trim() === '') {
+                alert('Por favor, digite um texto antes de salvar.');
+                return;
+            }
+
+            const transaction = db.transaction(['savedTexts'], 'readwrite');
+            const objectStore = transaction.objectStore('savedTexts');
+            const request = objectStore.add({ text: text });
+
+            request.onsuccess = function (event) {
+                alert('Texto salvo com sucesso!');
+                loadSavedTexts();
+            };
+
+            request.onerror = function (event) {
+                console.error("Erro ao salvar o texto:", event.target.error);
+            };
+        }
+
+        function loadSavedTexts() {
+            const transaction = db.transaction(['savedTexts'], 'readonly');
+            const objectStore = transaction.objectStore('savedTexts');
+            const request = objectStore.getAll();
+
+            request.onsuccess = function (event) {
+                const savedTexts = event.target.result;
+                displaySavedTexts(savedTexts);
+            };
+
+            request.onerror = function (event) {
+                console.error("Erro ao carregar textos salvos:", event.target.error);
+            };
+        }
+
+        function displaySavedTexts(savedTexts) {
+            const savedTextsList = document.getElementById('savedTextsList');
+            savedTextsList.innerHTML = '';
+            savedTexts.forEach((text) => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+            <span>${text.text.substring(0, 50) + (text.text.length > 50 ? '...' : '')}</span>
+            <button class="delete-text" onclick="deleteSavedText(${text.id})">🗑️</button>
+        `;
+                li.querySelector('span').onclick = function () {
+                    document.getElementById('text-input').value = text.text;
+                };
+                savedTextsList.appendChild(li);
+            });
+        }
+
+        function deleteSavedText(id) {
+            const transaction = db.transaction(['savedTexts'], 'readwrite');
+            const objectStore = transaction.objectStore('savedTexts');
+            const request = objectStore.delete(id);
+
+            request.onsuccess = function (event) {
+                alert('Texto excluído com sucesso!');
+                loadSavedTexts();
+            };
+
+            request.onerror = function (event) {
+                console.error("Erro ao excluir o texto:", event.target.error);
+            };
+        }
+
+        function toggleSavedTexts() {
+            const savedTextsSection = document.getElementById('savedTextsSection');
+            if (savedTextsSection.style.display === 'none') {
+                savedTextsSection.style.display = 'block';
+                loadSavedTexts();
+            } else {
+                savedTextsSection.style.display = 'none';
+            }
+        }
+
+        textToSpeechAudio.addEventListener('play', () => {
+            isTextToSpeechPlaying = true;
+            if (youtubePlayer && youtubePlayer.getPlayerState() === YT.PlayerState.PLAYING) {
+                youtubePlayer.setVolume(20);
+            }
+        });
+
+        textToSpeechAudio.addEventListener('pause', () => {
+            isTextToSpeechPlaying = false;
+            if (youtubePlayer && youtubePlayer.getPlayerState() === YT.PlayerState.PLAYING) {
+                youtubePlayer.setVolume(100);
+            }
+        });
+
+        textToSpeechAudio.addEventListener('ended', () => {
+            isTextToSpeechPlaying = false;
+            if (youtubePlayer && youtubePlayer.getPlayerState() === YT.PlayerState.PLAYING) {
+                youtubePlayer.setVolume(100);
+            }
         });
     </script>
 </body>
