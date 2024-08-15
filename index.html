@@ -61,7 +61,7 @@
             margin-bottom: 5px;
             color: #BBBBBB;
         }
-        input[type="number"], input[type="text"] {
+        input[type="number"], input[type="text"], input[type="file"] {
             width: calc(100% - 22px);
             padding: 10px;
             border: none;
@@ -137,6 +137,34 @@
             margin-top: 10px;
             text-align: center;
         }
+        #customAudiosSection {
+            margin-top: 30px;
+        }
+        .custom-audio-box {
+            background-color: #2c2c2c;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .custom-audio-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #FFA500;
+        }
+        .custom-audio-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+        }
+        .delete-audio {
+            background-color: #ff6b6b;
+        }
+        .delete-audio:hover {
+            background-color: #ff4757;
+        }
     </style>
 </head>
 <body>
@@ -157,11 +185,23 @@
             </div>
 
             <div class="audio-box">
-                <div class="audio-title">Encerramento das Atividades</div>
+                <div class="audio-title">Aviso, 10 minutos para Fechar Academia</div>
                 <audio id="audioPlayer2" class="audio-player" controls>
                     <source src="audios/encerramento das atividades.mp3" type="audio/mpeg">
                     Seu navegador não suporta o elemento de áudio.
                 </audio>
+            </div>
+
+            <div id="customAudiosSection">
+                <h2>Áudios Personalizados</h2>
+                <div class="input-group">
+                    <label for="customAudioTitle">Título do Áudio:</label>
+                    <input type="text" id="customAudioTitle" placeholder="Digite o título do áudio">
+                    <label for="customAudioFile">Anexar Áudio:</label>
+                    <input type="file" id="customAudioFile" accept="audio/*">
+                    <button onclick="saveCustomAudio()">Salvar Áudio</button>
+                </div>
+                <div id="customAudiosList"></div>
             </div>
         </div>
         
@@ -195,6 +235,7 @@
         const timerDisplay = document.getElementById('timer');
         const youtubeLinkInput = document.getElementById('youtubeLink');
         const youtubeOverlay = document.getElementById('youtubeOverlay');
+        const customAudiosList = document.getElementById('customAudiosList');
         let interval = parseInt(localStorage.getItem('interval')) || 120000;
         let timeoutId;
         let countdownInterval;
@@ -202,18 +243,140 @@
         let youtubePlayer;
         let overlayTimeoutId;
         let isAudio2Playing = false;
+        let customAudios = [];
+        let db;
 
-        const savedVideoId = localStorage.getItem('youtubeVideoId');
-        if (savedVideoId) {
-            createYouTubePlayer(savedVideoId);
-            youtubeLinkInput.value = `https://www.youtube.com/watch?v=${savedVideoId}`;
+        function initIndexedDB() {
+            const request = indexedDB.open('CustomAudiosDB', 1);
+
+            request.onerror = function(event) {
+                console.error("Erro ao abrir o banco de dados:", event.target.error);
+            };
+
+            request.onsuccess = function(event) {
+                db = event.target.result;
+                loadCustomAudios();
+            };
+
+            request.onupgradeneeded = function(event) {
+                db = event.target.result;
+                const objectStore = db.createObjectStore('customAudios', { keyPath: 'id', autoIncrement: true });
+                objectStore.createIndex('title', 'title', { unique: false });
+            };
+        }
+
+        function saveCustomAudio() {
+            const title = document.getElementById('customAudioTitle').value;
+            const fileInput = document.getElementById('customAudioFile');
+            const file = fileInput.files[0];
+
+            if (!title || !file) {
+                alert('Por favor, preencha o título e selecione um arquivo de áudio.');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const audioData = e.target.result;
+                const transaction = db.transaction(['customAudios'], 'readwrite');
+                const objectStore = transaction.objectStore('customAudios');
+                const request = objectStore.add({ title: title, audioData: audioData });
+
+                request.onsuccess = function(event) {
+                    alert('Áudio personalizado salvo com sucesso!');
+                    document.getElementById('customAudioTitle').value = '';
+                    fileInput.value = '';
+                    loadCustomAudios();
+                };
+
+                request.onerror = function(event) {
+                    console.error("Erro ao salvar o áudio personalizado:", event.target.error);
+                };
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function loadCustomAudios() {
+            const transaction = db.transaction(['customAudios'], 'readonly');
+            const objectStore = transaction.objectStore('customAudios');
+            const request = objectStore.getAll();
+
+            request.onsuccess = function(event) {
+                customAudios = event.target.result;
+                displayCustomAudios();
+            };
+
+            request.onerror = function(event) {
+                console.error("Erro ao carregar áudios personalizados:", event.target.error);
+            };
+        }
+
+        function displayCustomAudios() {
+            customAudiosList.innerHTML = '';
+            customAudios.forEach((audio, index) => {
+                const audioBox = document.createElement('div');
+                audioBox.className = 'custom-audio-box';
+                audioBox.innerHTML = `
+                    <div class="custom-audio-title">${audio.title}</div>
+                    <audio controls>
+                        <source src="${audio.audioData}" type="audio/mpeg">
+                        Seu navegador não suporta o elemento de áudio.
+                    </audio>
+                    <div class="custom-audio-controls">
+                        <button onclick="playCustomAudio(${index})">Reproduzir</button>
+                        <button class="delete-audio" onclick="deleteCustomAudio(${audio.id})">Excluir</button>
+                    </div>
+                `;
+                customAudiosList.appendChild(audioBox);
+            });
+        }
+
+        function playCustomAudio(index) {
+            const audio = customAudios[index];
+            const audioElement = new Audio(audio.audioData);
+            audioElement.play();
+            if (youtubePlayer && youtubePlayer.getPlayerState() === YT.PlayerState.PLAYING) {
+                youtubePlayer.setVolume(20);
+            }
+            audioElement.onended = function() {
+                if (youtubePlayer && youtubePlayer.getPlayerState() === YT.PlayerState.PLAYING) {
+                    youtubePlayer.setVolume(100);
+                }
+            };
+        }
+
+        function deleteCustomAudio(id) {
+            const transaction = db.transaction(['customAudios'], 'readwrite');
+            const objectStore = transaction.objectStore('customAudios');
+            const request = objectStore.delete(id);
+
+            request.onsuccess = function(event) {
+                alert('Áudio personalizado excluído com sucesso!');
+                loadCustomAudios();
+            };
+
+            request.onerror = function(event) {
+                console.error("Erro ao excluir o áudio personalizado:", event.target.error);
+            };
+        }
+
+        function initYouTubePlayer() {
+            const savedVideoId = localStorage.getItem('youtubeVideoId');
+            if (savedVideoId) {
+                createYouTubePlayer(savedVideoId);
+                youtubeLinkInput.value = `https://www.youtube.com/watch?v=${savedVideoId}`;
+            }
         }
 
         function saveState() {
             localStorage.setItem('interval', interval);
             localStorage.setItem('remainingTime', remainingTime);
-            if (youtubePlayer) {
-                localStorage.setItem('youtubeVideoId', youtubePlayer.getVideoData().video_id);
+            localStorage.setItem('intervalInputValue', intervalInput.value);
+            if (youtubePlayer && youtubePlayer.getVideoData) {
+                const videoData = youtubePlayer.getVideoData();
+                if (videoData && videoData.video_id) {
+                    localStorage.setItem('youtubeVideoId', videoData.video_id);
+                }
             }
         }
 
@@ -228,176 +391,189 @@
         }
 
         function playAudio() {
-            if (isAudio2Playing) {
-                remainingTime = 60000; // 1 minuto de atraso
-                updateTimerDisplay(remainingTime);
-                timeoutId = setTimeout(() => {
-                    audioPlayer.currentTime = 0;
-                    audioPlayer.play();
-                    if (youtubePlayer && youtubePlayer.getPlayerState() === YT.PlayerState.PLAYING) {
-                        youtubePlayer.setVolume(20);
-                    }
-                }, 60000);
-            } else {
-                audioPlayer.currentTime = 0;
-                audioPlayer.play();
-                if (youtubePlayer && youtubePlayer.getPlayerState() === YT.PlayerState.PLAYING) {
-                    youtubePlayer.setVolume(20);
-                }
-            }
-        }
-
-        function resetTimeout() {
-            clearTimeout(timeoutId);
-            clearInterval(countdownInterval);
-            timeoutId = setTimeout(playAudio, remainingTime);
-            startCountdown();
-        }
-
-        function startCountdown() {
-            updateTimerDisplay(remainingTime);
-            countdownInterval = setInterval(() => {
-                remainingTime -= 1000;
-                if (remainingTime < 0) {
-                    clearInterval(countdownInterval);
-                    remainingTime = interval;
-                    resetTimeout();
-                } else {
-                    updateTimerDisplay(remainingTime);
-                }
-                saveState();
-            }, 1000);
-        }
-
-        function updateTimerDisplay(time) {
-            const minutes = Math.floor(time / 60000);
-            const seconds = Math.floor((time % 60000) / 1000);
-            timerDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-        }
-
-        function loadYouTubeVideo() {
-            const youtubeUrl = youtubeLinkInput.value;
-            const videoId = extractVideoId(youtubeUrl);
-            if (videoId) {
-                if (youtubePlayer) {
-                    youtubePlayer.loadVideoById(videoId);
-                } else {
-                    createYouTubePlayer(videoId);
-                }
-                localStorage.setItem('youtubeVideoId', videoId);
-            } else {
-                showError('URL do YouTube inválida');
-            }
-        }
-
-        function createYouTubePlayer(videoId) {
-            youtubePlayer = new YT.Player('youtubePlayer', {
-                height: '315',
-                width: '100%',
-                videoId: videoId,
-                events: {
-                    'onReady': onYouTubePlayerReady,
-                    'onError': onYouTubePlayerError,
-                    'onStateChange': onYouTubePlayerStateChange
-                }
-            });
-        }
-
-        function onYouTubePlayerReady(event) {
-            event.target.playVideo();
-            hideError();
-            startOverlayTimer();
-        }
-
-        function onYouTubePlayerError(event) {
-            showError('Erro ao carregar o vídeo do YouTube. Código de erro: ' + event.data);
-        }
-
-        function onYouTubePlayerStateChange(event) {
-            if (event.data === YT.PlayerState.PLAYING && audioPlayer.paused && !isAudio2Playing) {
-                youtubePlayer.setVolume(100);
-            }
-        }
-
-        function extractVideoId(url) {
-            const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
-            const match = url.match(regExp);
-            return (match && match[7].length === 11) ? match[7] : false;
-        }
-
-        function showError(message) {
-            document.getElementById('errorMessage').textContent = message;
-        }
-
-        function hideError() {
-            document.getElementById('errorMessage').textContent = '';
-        }
-
-        function clearLinkField() {
-            youtubeLinkInput.value = '';
-        }
-
-        function startOverlayTimer() {
-            clearTimeout(overlayTimeoutId);
-            youtubeOverlay.style.display = 'none';
-            overlayTimeoutId = setTimeout(() => {
-                youtubeOverlay.style.display = 'flex';
-            }, 3000);
-        }
-
-        audioPlayer.addEventListener('play', () => {
-            resetTimeout();
+    if (isAudio2Playing) {
+        remainingTime = 60000; // 1 minuto de atraso
+        updateTimerDisplay(remainingTime);
+        timeoutId = setTimeout(() => {
+            audioPlayer.currentTime = 0;
+            audioPlayer.play();
             if (youtubePlayer && youtubePlayer.getPlayerState() === YT.PlayerState.PLAYING) {
                 youtubePlayer.setVolume(20);
             }
-        });
+        }, 60000);
+    } else {
+        audioPlayer.currentTime = 0;
+        audioPlayer.play();
+        if (youtubePlayer && youtubePlayer.getPlayerState() === YT.PlayerState.PLAYING) {
+            youtubePlayer.setVolume(20);
+        }
+    }
+}
 
-        audioPlayer.addEventListener('pause', () => {
-            saveState();
-            if (youtubePlayer && youtubePlayer.getPlayerState() === YT.PlayerState.PLAYING) {
-                youtubePlayer.setVolume(100);
-            }
-        });
+function resetTimeout() {
+    clearTimeout(timeoutId);
+    clearInterval(countdownInterval);
+    timeoutId = setTimeout(playAudio, remainingTime);
+    startCountdown();
+}
 
-        audioPlayer.addEventListener('ended', () => {
+function startCountdown() {
+    updateTimerDisplay(remainingTime);
+    countdownInterval = setInterval(() => {
+        remainingTime -= 1000;
+        if (remainingTime < 0) {
+            clearInterval(countdownInterval);
             remainingTime = interval;
             resetTimeout();
-            if (youtubePlayer && youtubePlayer.getPlayerState() === YT.PlayerState.PLAYING) {
-                youtubePlayer.setVolume(100);
-            }
-        });
-
-        audioPlayer2.addEventListener('play', () => {
-            isAudio2Playing = true;
-            if (youtubePlayer && youtubePlayer.getPlayerState() === YT.PlayerState.PLAYING) {
-                youtubePlayer.setVolume(20);
-            }
-        });
-
-        audioPlayer2.addEventListener('pause', () => {
-            isAudio2Playing = false;
-            if (youtubePlayer && youtubePlayer.getPlayerState() === YT.PlayerState.PLAYING) {
-                youtubePlayer.setVolume(100);
-            }
-        });
-
-        audioPlayer2.addEventListener('ended', () => {
-            isAudio2Playing = false;
-            if (youtubePlayer && youtubePlayer.getPlayerState() === YT.PlayerState.PLAYING) {
-                youtubePlayer.setVolume(100);
-            }
-        });
-
-        document.getElementById('youtubePlayer').addEventListener('mousemove', startOverlayTimer);
-        document.getElementById('youtubePlayer').addEventListener('mouseleave', startOverlayTimer);
-
-        resetTimeout();
-
-        setInterval(saveState, 1000);
-
-        function onYouTubeIframeAPIReady() {
-            // A API está pronta
+        } else {
+            updateTimerDisplay(remainingTime);
         }
+        saveState();
+    }, 1000);
+}
+
+function updateTimerDisplay(time) {
+    const minutes = Math.floor(time / 60000);
+    const seconds = Math.floor((time % 60000) / 1000);
+    timerDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+}
+
+function loadYouTubeVideo() {
+    const youtubeUrl = youtubeLinkInput.value;
+    const videoId = extractVideoId(youtubeUrl);
+    if (videoId) {
+        if (youtubePlayer) {
+            youtubePlayer.loadVideoById(videoId);
+        } else {
+            createYouTubePlayer(videoId);
+        }
+        localStorage.setItem('youtubeVideoId', videoId);
+    } else {
+        showError('URL do YouTube inválida');
+    }
+}
+
+function createYouTubePlayer(videoId) {
+    youtubePlayer = new YT.Player('youtubePlayer', {
+        height: '315',
+        width: '100%',
+        videoId: videoId,
+        events: {
+            'onReady': onYouTubePlayerReady,
+            'onError': onYouTubePlayerError,
+            'onStateChange': onYouTubePlayerStateChange
+        }
+    });
+}
+
+function onYouTubePlayerReady(event) {
+    event.target.playVideo();
+    hideError();
+    startOverlayTimer();
+}
+
+function onYouTubePlayerError(event) {
+    showError('Erro ao carregar o vídeo do YouTube. Código de erro: ' + event.data);
+}
+
+function onYouTubePlayerStateChange(event) {
+    if (event.data === YT.PlayerState.PLAYING && audioPlayer.paused && !isAudio2Playing) {
+        youtubePlayer.setVolume(100);
+    }
+}
+
+function extractVideoId(url) {
+    const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
+    const match = url.match(regExp);
+    return (match && match[7].length === 11) ? match[7] : false;
+}
+
+function showError(message) {
+    document.getElementById('errorMessage').textContent = message;
+}
+
+function hideError() {
+    document.getElementById('errorMessage').textContent = '';
+}
+
+function clearLinkField() {
+    youtubeLinkInput.value = '';
+}
+
+function startOverlayTimer() {
+    clearTimeout(overlayTimeoutId);
+    youtubeOverlay.style.display = 'none';
+    overlayTimeoutId = setTimeout(() => {
+        youtubeOverlay.style.display = 'flex';
+    }, 3000);
+}
+
+audioPlayer.addEventListener('play', () => {
+    resetTimeout();
+    if (youtubePlayer && youtubePlayer.getPlayerState() === YT.PlayerState.PLAYING) {
+        youtubePlayer.setVolume(20);
+    }
+});
+
+audioPlayer.addEventListener('pause', () => {
+    saveState();
+    if (youtubePlayer && youtubePlayer.getPlayerState() === YT.PlayerState.PLAYING) {
+        youtubePlayer.setVolume(100);
+    }
+});
+
+audioPlayer.addEventListener('ended', () => {
+    remainingTime = interval;
+    resetTimeout();
+    if (youtubePlayer && youtubePlayer.getPlayerState() === YT.PlayerState.PLAYING) {
+        youtubePlayer.setVolume(100);
+    }
+});
+
+audioPlayer2.addEventListener('play', () => {
+    isAudio2Playing = true;
+    if (youtubePlayer && youtubePlayer.getPlayerState() === YT.PlayerState.PLAYING) {
+        youtubePlayer.setVolume(20);
+    }
+});
+
+audioPlayer2.addEventListener('pause', () => {
+    isAudio2Playing = false;
+    if (youtubePlayer && youtubePlayer.getPlayerState() === YT.PlayerState.PLAYING) {
+        youtubePlayer.setVolume(100);
+    }
+});
+
+audioPlayer2.addEventListener('ended', () => {
+    isAudio2Playing = false;
+    if (youtubePlayer && youtubePlayer.getPlayerState() === YT.PlayerState.PLAYING) {
+        youtubePlayer.setVolume(100);
+    }
+});
+
+document.getElementById('youtubePlayer').addEventListener('mousemove', startOverlayTimer);
+document.getElementById('youtubePlayer').addEventListener('mouseleave', startOverlayTimer);
+
+// Carregar o valor salvo do intervalo
+const savedIntervalInputValue = localStorage.getItem('intervalInputValue');
+if (savedIntervalInputValue) {
+    intervalInput.value = savedIntervalInputValue;
+    interval = parseInt(savedIntervalInputValue) * 60000;
+}
+
+resetTimeout();
+
+setInterval(saveState, 1000);
+
+function onYouTubeIframeAPIReady() {
+    initYouTubePlayer();
+}
+
+// Inicializar o player do YouTube quando a página carregar
+window.addEventListener('load', () => {
+    initYouTubePlayer();
+    initIndexedDB();
+});
     </script>
 </body>
 </html>
