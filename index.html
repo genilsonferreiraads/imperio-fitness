@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +9,7 @@
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
@@ -15,27 +17,38 @@
             background-color: #121212;
             color: #ffffff;
         }
+
         .container {
             display: flex;
             background-color: #1e1e1e;
             padding: 30px;
             border-radius: 15px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
             width: 900px;
             gap: 30px;
         }
-        .left-column, .right-column {
+
+        .audio-video-section {
+            display: flex;
+            width: 100%;
+            gap: 30px;
+        }
+
+        .left-column,
+        .right-column {
             flex: 1;
             display: flex;
             flex-direction: column;
             gap: 20px;
         }
+
         .audio-box {
             background-color: #2c2c2c;
             border-radius: 10px;
             padding: 20px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
+
         .timer-display {
             font-size: 3em;
             text-align: center;
@@ -43,26 +56,33 @@
             font-weight: bold;
             color: #FFA500;
         }
+
         .audio-title {
             font-size: 1.2em;
             font-weight: bold;
             margin-bottom: 10px;
             color: #FFA500;
         }
+
         .audio-player {
             width: 100%;
             margin-bottom: 20px;
         }
+
         .input-group {
             margin-bottom: 20px;
         }
+
         .input-group label {
             display: block;
             margin-bottom: 5px;
             color: #BBBBBB;
         }
-        input[type="number"], input[type="text"], input[type="file"] {
-            width: calc(100% - 22px);
+
+        input[type="number"],
+        input[type="text"],
+        input[type="file"] {
+            width: 100%;
             padding: 10px;
             border: none;
             background-color: #3c3c3c;
@@ -70,15 +90,18 @@
             border-radius: 5px;
             margin-bottom: 10px;
         }
+
         input[type="number"] {
             width: 60px;
             -moz-appearance: textfield;
         }
+
         input[type="number"]::-webkit-outer-spin-button,
         input[type="number"]::-webkit-inner-spin-button {
             -webkit-appearance: none;
             margin: 0;
         }
+
         button {
             background-color: #FFA500;
             color: black;
@@ -88,9 +111,11 @@
             cursor: pointer;
             transition: background-color 0.3s;
         }
+
         button:hover {
             background-color: #FF8C00;
         }
+
         #youtubePlayer {
             width: 100%;
             height: 315px;
@@ -99,6 +124,7 @@
             overflow: hidden;
             position: relative;
         }
+
         #youtubeOverlay {
             position: absolute;
             top: 0;
@@ -112,6 +138,7 @@
             font-size: 24px;
             color: white;
         }
+
         .sound-wave {
             width: 100px;
             height: 100px;
@@ -119,113 +146,185 @@
             justify-content: space-between;
             align-items: flex-end;
         }
+
         .sound-wave span {
             width: 10px;
             background-color: #FFA500;
             animation: sound-wave 1.5s infinite ease-in-out;
         }
-        .sound-wave span:nth-child(2) { animation-delay: 0.2s; }
-        .sound-wave span:nth-child(3) { animation-delay: 0.4s; }
-        .sound-wave span:nth-child(4) { animation-delay: 0.6s; }
-        .sound-wave span:nth-child(5) { animation-delay: 0.8s; }
-        @keyframes sound-wave {
-            0%, 100% { height: 10px; }
-            50% { height: 100px; }
+
+        .sound-wave span:nth-child(2) {
+            animation-delay: 0.2s;
         }
+
+        .sound-wave span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        .sound-wave span:nth-child(4) {
+            animation-delay: 0.6s;
+        }
+
+        .sound-wave span:nth-child(5) {
+            animation-delay: 0.8s;
+        }
+
+        @keyframes sound-wave {
+
+            0%,
+            100% {
+                height: 10px;
+            }
+
+            50% {
+                height: 100px;
+            }
+        }
+
         #errorMessage {
             color: #ff6b6b;
             margin-top: 10px;
             text-align: center;
         }
+
         #customAudiosSection {
             margin-top: 30px;
+            width: 900px;
+            background-color: #1e1e1e;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
         }
+
+        #customAudiosSection .input-group {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+#customAudiosSection .input-group input[type="text"],
+#customAudiosSection .input-group input[type="file"] {
+    flex: 1;
+    min-width: 220px;
+}
+
+#customAudiosSection .input-group button {
+    flex: 0 0 auto;
+    margin-left: auto;
+    margin-top: -12px;
+    padding: 12px;
+}
+
+#customAudiosSection .input-group label {
+    flex: 0 0 auto;
+    margin-right: 10px;
+}
+
+        #customAudiosList {
+            margin-top: 20px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
         .custom-audio-box {
             background-color: #2c2c2c;
             border-radius: 10px;
             padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
+
         .custom-audio-title {
             font-size: 1.2em;
             font-weight: bold;
             margin-bottom: 10px;
             color: #FFA500;
         }
+
         .custom-audio-controls {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-top: 10px;
         }
+
         .delete-audio {
             background-color: #ff6b6b;
         }
+
         .delete-audio:hover {
             background-color: #ff4757;
         }
     </style>
 </head>
+
 <body>
     <div class="container">
-        <div class="left-column">
-            <div class="audio-box">
-                <div class="timer-display" id="timer"></div>
-                <div class="audio-title">Aviso dos Pesos</div>
-                <audio id="audioPlayer" class="audio-player" controls>
-                    <source src="audios/audio alunos imperio.mp3" type="audio/mpeg">
-                    Seu navegador não suporta o elemento de áudio.
-                </audio>
-                <div class="input-group">
-                    <label for="intervalInput">Intervalo de reprodução (minutos):</label>
-                    <input type="number" id="intervalInput" min="1" value="2" step="1">
-                    <button onclick="updateInterval()">Atualizar</button>
-                </div>
-            </div>
-
-            <div class="audio-box">
-                <div class="audio-title">Aviso, 10 minutos para Fechar Academia</div>
-                <audio id="audioPlayer2" class="audio-player" controls>
-                    <source src="audios/encerramento das atividades.mp3" type="audio/mpeg">
-                    Seu navegador não suporta o elemento de áudio.
-                </audio>
-            </div>
-
-            <div id="customAudiosSection">
-                <h2>Áudios Personalizados</h2>
-                <div class="input-group">
-                    <label for="customAudioTitle">Título do Áudio:</label>
-                    <input type="text" id="customAudioTitle" placeholder="Digite o título do áudio">
-                    <label for="customAudioFile">Anexar Áudio:</label>
-                    <input type="file" id="customAudioFile" accept="audio/*">
-                    <button onclick="saveCustomAudio()">Salvar Áudio</button>
-                </div>
-                <div id="customAudiosList"></div>
-            </div>
-        </div>
-        
-        <div class="right-column">
-            <div class="input-group">
-                <label for="youtubeLink">Link do YouTube:</label>
-                <input type="text" id="youtubeLink" placeholder="Cole o link do YouTube aqui" onclick="clearLinkField()">
-                <button onclick="loadYouTubeVideo()">Carregar Vídeo</button>
-            </div>
-            
-            <div id="youtubePlayer">
-                <div id="youtubeOverlay">
-                    <div class="sound-wave">
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                        <span></span>
+        <div class="audio-video-section">
+            <!-- Coluna Esquerda: Áudios de Avisos -->
+            <div class="left-column">
+                <div class="audio-box">
+                    <div class="timer-display" id="timer"></div>
+                    <div class="audio-title">Aviso dos Pesos</div>
+                    <audio id="audioPlayer" class="audio-player" controls>
+                        <source src="audios/audio alunos imperio.mp3" type="audio/mpeg">
+                        Seu navegador não suporta o elemento de áudio.
+                    </audio>
+                    <div class="input-group">
+                        <label for="intervalInput">Intervalo de reprodução (minutos):</label>
+                        <input type="number" id="intervalInput" min="1" value="2" step="1">
+                        <button onclick="updateInterval()">Atualizar</button>
                     </div>
                 </div>
+
+                <div class="audio-box">
+                    <div class="audio-title">Aviso, 10 minutos para Fechar Academia</div>
+                    <audio id="audioPlayer2" class="audio-player" controls>
+                        <source src="audios/encerramento das atividades.mp3" type="audio/mpeg">
+                        Seu navegador não suporta o elemento de áudio.
+                    </audio>
+                </div>
             </div>
-            <div id="errorMessage"></div>
+
+            <!-- Coluna Direita: Vídeo do YouTube -->
+            <div class="right-column">
+                <div class="input-group">
+                    <label for="youtubeLink">Link do YouTube:</label>
+                    <input type="text" id="youtubeLink" placeholder="Cole o link do YouTube aqui" onclick="clearLinkField()">
+                    <button onclick="loadYouTubeVideo()">Carregar Vídeo</button>
+                </div>
+
+                <div id="youtubePlayer">
+                    <div id="youtubeOverlay">
+                        <div class="sound-wave">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                    </div>
+                </div>
+                <div id="errorMessage"></div>
+            </div>
         </div>
     </div>
+
+    <!-- Seção Separada para Áudios Personalizados -->
+    <div id="customAudiosSection">
+        <h2>Áudios Personalizados</h2>
+        <div class="input-group">
+            <label for="customAudioTitle">Título do Áudio:</label>
+            <input type="text" id="customAudioTitle" placeholder="Digite o título do áudio">
+            <label for="customAudioFile">Anexar Áudio:</label>
+            <input type="file" id="customAudioFile" accept="audio/*">
+            <button onclick="saveCustomAudio()">Salvar Áudio</button>
+        </div>
+        <div id="customAudiosList"></div>
+    </div>
+</div>
+               
 
     <script src="https://www.youtube.com/iframe_api"></script>
     <script>
@@ -249,16 +348,16 @@
         function initIndexedDB() {
             const request = indexedDB.open('CustomAudiosDB', 1);
 
-            request.onerror = function(event) {
+            request.onerror = function (event) {
                 console.error("Erro ao abrir o banco de dados:", event.target.error);
             };
 
-            request.onsuccess = function(event) {
+            request.onsuccess = function (event) {
                 db = event.target.result;
                 loadCustomAudios();
             };
 
-            request.onupgradeneeded = function(event) {
+            request.onupgradeneeded = function (event) {
                 db = event.target.result;
                 const objectStore = db.createObjectStore('customAudios', { keyPath: 'id', autoIncrement: true });
                 objectStore.createIndex('title', 'title', { unique: false });
@@ -276,20 +375,20 @@
             }
 
             const reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = function (e) {
                 const audioData = e.target.result;
                 const transaction = db.transaction(['customAudios'], 'readwrite');
                 const objectStore = transaction.objectStore('customAudios');
                 const request = objectStore.add({ title: title, audioData: audioData });
 
-                request.onsuccess = function(event) {
+                request.onsuccess = function (event) {
                     alert('Áudio personalizado salvo com sucesso!');
                     document.getElementById('customAudioTitle').value = '';
                     fileInput.value = '';
                     loadCustomAudios();
                 };
 
-                request.onerror = function(event) {
+                request.onerror = function (event) {
                     console.error("Erro ao salvar o áudio personalizado:", event.target.error);
                 };
             };
@@ -301,12 +400,12 @@
             const objectStore = transaction.objectStore('customAudios');
             const request = objectStore.getAll();
 
-            request.onsuccess = function(event) {
+            request.onsuccess = function (event) {
                 customAudios = event.target.result;
                 displayCustomAudios();
             };
 
-            request.onerror = function(event) {
+            request.onerror = function (event) {
                 console.error("Erro ao carregar áudios personalizados:", event.target.error);
             };
         }
@@ -351,12 +450,12 @@
             const objectStore = transaction.objectStore('customAudios');
             const request = objectStore.delete(id);
 
-            request.onsuccess = function(event) {
+            request.onsuccess = function (event) {
                 alert('Áudio personalizado excluído com sucesso!');
                 loadCustomAudios();
             };
 
-            request.onerror = function(event) {
+            request.onerror = function (event) {
                 console.error("Erro ao excluir o áudio personalizado:", event.target.error);
             };
         }
@@ -577,4 +676,5 @@
         });
     </script>
 </body>
+
 </html>
