@@ -7,6 +7,7 @@
     <title>Player de Áudio Automático com YouTube</title>
     <style>
         body {
+            
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
             flex-direction: column;
@@ -19,6 +20,7 @@
         }
 
         .container {
+            margin-top: 60px;
             display: flex;
             background-color: #1e1e1e;
             padding: 30px;
@@ -189,6 +191,7 @@
 
         #customAudiosSection {
             margin-top: 30px;
+            margin-bottom: 60px;
             width: 900px;
             background-color: #1e1e1e;
             padding: 30px;
@@ -197,29 +200,30 @@
         }
 
         #customAudiosSection .input-group {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
-}
-#customAudiosSection .input-group input[type="text"],
-#customAudiosSection .input-group input[type="file"] {
-    flex: 1;
-    min-width: 220px;
-}
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
 
-#customAudiosSection .input-group button {
-    flex: 0 0 auto;
-    margin-left: auto;
-    margin-top: -12px;
-    padding: 12px;
-}
+        #customAudiosSection .input-group input[type="text"],
+        #customAudiosSection .input-group input[type="file"] {
+            flex: 1;
+            min-width: 220px;
+        }
 
-#customAudiosSection .input-group label {
-    flex: 0 0 auto;
-    margin-right: 10px;
-}
+        #customAudiosSection .input-group button {
+            flex: 0 0 auto;
+            margin-left: auto;
+            margin-top: -12px;
+            padding: 12px;
+        }
+
+        #customAudiosSection .input-group label {
+            flex: 0 0 auto;
+            margin-right: 10px;
+        }
 
         #customAudiosList {
             margin-top: 20px;
@@ -291,7 +295,8 @@
             <div class="right-column">
                 <div class="input-group">
                     <label for="youtubeLink">Link do YouTube:</label>
-                    <input type="text" id="youtubeLink" placeholder="Cole o link do YouTube aqui" onclick="clearLinkField()">
+                    <input type="text" id="youtubeLink" placeholder="Cole o link do YouTube aqui"
+                        onclick="clearLinkField()">
                     <button onclick="loadYouTubeVideo()">Carregar Vídeo</button>
                 </div>
 
@@ -310,6 +315,10 @@
             </div>
         </div>
     </div>
+    </div>
+    </div>
+    </div>
+    </div>
 
     <!-- Seção Separada para Áudios Personalizados -->
     <div id="customAudiosSection">
@@ -323,8 +332,8 @@
         </div>
         <div id="customAudiosList"></div>
     </div>
-</div>
-               
+    </div>
+
 
     <script src="https://www.youtube.com/iframe_api"></script>
     <script>
