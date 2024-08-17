@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" href="imagens/Icon.ico" type="image/x-icon">
     <title>Império Fitness</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -17,16 +18,42 @@
             margin: 0;
             background-color: #121212;
             color: #ffffff;
+            padding-top: 70px;
+            /* Adicionado para dar espaço ao cabeçalho fixo */
+        }
+
+        .header {
+            cursor: pointer;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: #1e1e1e;
+            padding: 20px 0;
+            text-align: center;
+            z-index: 1000;
+        }
+
+        .header h1 {
+            color: #FF5500;
+            margin: 0;
+            font-size: 30px;
+            transition: transform 0.3s ease;
+        }
+
+        .header h1:hover {
+            transform: scale(1.04);
         }
 
         .container {
-            margin-top: 60px;
+            margin-top: 30px;
             display: flex;
             background-color: #1e1e1e;
             padding: 30px;
             border-radius: 15px;
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
-            width: 900px;
+            width: 90%;
+            max-width: 900px;
             gap: 30px;
         }
 
@@ -56,14 +83,14 @@
             text-align: center;
             margin-bottom: 20px;
             font-weight: bold;
-            color: #FFA500;
+            color: #FF5500;
         }
 
         .audio-title {
             font-size: 1.2em;
             font-weight: bold;
             margin-bottom: 10px;
-            color: #FFA500;
+            color: #FF5500;
         }
 
         .audio-player {
@@ -102,6 +129,7 @@
         }
 
         .input-group label {
+            font-weight: bold;
             display: block;
             margin-bottom: 5px;
             color: #BBBBBB;
@@ -131,7 +159,7 @@
         }
 
         button {
-            background-color: #FFA500;
+            background-color: #FF5500;
             color: black;
             border: none;
             padding: 10px 15px;
@@ -147,7 +175,7 @@
         #youtubePlayer {
             width: 100%;
             height: 315px;
-            margin-top: 20px;
+            margin-top: -20px;
             border-radius: 10px;
             overflow: hidden;
             position: relative;
@@ -177,7 +205,7 @@
 
         .sound-wave span {
             width: 10px;
-            background-color: #FFA500;
+            background-color: #FF5500;
             animation: sound-wave 1.5s infinite ease-in-out;
         }
 
@@ -210,19 +238,22 @@
         }
 
         #errorMessage {
-            color: #FFA500;
+            color: #FF5500;
             margin-top: 10px;
             text-align: center;
         }
 
         .Custom-audio-section-title {
-            color: #FF8C00;
+            color: #FF5500;
+            font-size: 1.5em;
+            margin-bottom: 15px;
         }
 
         #customAudiosSection {
-            margin-top: 30px;
-            margin-bottom: 40px;
-            width: 900px;
+            margin-top: 5px;
+            margin-bottom: 60px;
+            width: 90%;
+            max-width: 900px;
             background-color: #1e1e1e;
             padding: 30px;
             border-radius: 15px;
@@ -243,6 +274,15 @@
             min-width: 220px;
         }
 
+
+        .input-group input[type="text"],
+        .input-group input[type="file"] {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+
         #customAudiosSection .input-group button {
             flex: 0 0 auto;
             margin-left: auto;
@@ -258,11 +298,18 @@
         #customAudiosList {
             margin-top: 20px;
             display: grid;
+            margin: 10px;
             grid-template-columns: repeat(2, 1fr);
+            /* Sempre 2 colunas */
             gap: 20px;
+            justify-content: center;
+            /* Centraliza os áudios na seção */
         }
 
         .custom-audio-box {
+            align-items: center;
+            display: grid;
+            justify-content: center;
             background-color: #2c2c2c;
             border-radius: 10px;
             padding: 20px;
@@ -270,54 +317,74 @@
         }
 
         .custom-audio-title {
+            justify-content: center;
+            align-items: center;
+            display: flex;
             font-size: 1.2em;
             font-weight: bold;
             margin-bottom: 10px;
-            color: #FFA500;
+            color: #FF5500;
         }
+
 
         .custom-audio-controls {
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
             margin-top: 10px;
         }
 
+
         .delete-audio {
-            background-color: #FFA500;
+            background-color: #FF5500;
         }
 
         .delete-audio:hover {
             background-color: #FF8C00;
         }
 
-        /* Estilos para a nova seção de texto para áudio */
         #textToSpeechSection {
             margin-top: 30px;
             margin-bottom: 40px;
-            width: 900px;
+            width: 90%;
+            max-width: 900px;
             background-color: #1e1e1e;
             padding: 30px;
             border-radius: 15px;
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
         }
 
-        #textToSpeechSection h2 {
-            color: #FF8C00;
+        .input-container {
+            display: flex;
+            justify-content: center;
+            /* Centraliza o textarea horizontalmente */
             margin-bottom: 20px;
+            /* Espaçamento entre o input e o próximo elemento */
         }
 
+        #textToSpeechSection h2 {
+            font-size: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #FF5500;
+            margin-bottom: 20px;
+
+        }
+
+
+
         #text-input {
-            width: 100%;
+            width: 750px;
+            max-width: 900px;
             height: 100px;
             padding: 10px;
             font-size: 16px;
-            border: none;
+            border: aliceblue;
             background-color: #3c3c3c;
             color: #ffffff;
             border-radius: 5px;
-            margin-bottom: 20px;
-            resize: vertical;
+            resize: inline;
         }
 
         #textToSpeechSection button {
@@ -330,10 +397,17 @@
             margin-right: 10px;
         }
 
+        #textToSpeechSection .controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
 
         #textToSpeechSection audio {
-            width: 100%;
-            margin-top: 20px;
+            flex: 1;
+            height: 40px;
+            max-width: 250px;
         }
 
         #savedTextsSection {
@@ -360,10 +434,83 @@
         #savedTextsList li:hover {
             background-color: #4c4c4c;
         }
+
+        footer {
+            background-color: #1e1e1e;
+            color: #ffffff;
+            text-align: center;
+            padding: 40px 0;
+            width: 100%;
+            position: relative;
+            bottom: 0;
+            left: 0;
+            overflow: hidden;
+
+        }
+
+        footer p {
+            color: #FF5500;
+            margin: 0;
+            transition: transform 0.3s ease;
+            cursor: pointer;
+            display: inline-block;
+
+        }
+
+        footer p:hover {
+            transform: scale(1.04);
+            transform-origin: center;
+
+        }
+
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .audio-video-section {
+                flex-direction: column;
+            }
+
+            .header h1 {
+                font-size: 25px;
+            }
+
+            .left-column,
+            .right-column {
+                width: 100%;
+            }
+
+            #youtubePlayer {
+                height: 200px;
+            }
+
+            #customAudiosList {
+                grid-template-columns: 1fr;
+            }
+
+            #textToSpeechSection .controls {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                padding: 5px;
+            }
+
+
+
+
+            #textToSpeechSection audio {
+                max-width: 100%;
+            }
+        }
     </style>
 </head>
 
 <body>
+    <header class="header">
+        <h1>Academia Império Fitness</h1>
+    </header>
+
     <div class="container">
         <div class="audio-video-section">
             <!-- Coluna Esquerda: Áudios de Avisos -->
@@ -378,7 +525,7 @@
                     <div class="input-group">
                         <label for="intervalInput">Intervalo de reprodução (minutos):</label>
                         <input type="number" id="intervalInput" min="1" value="2" step="1">
-                        <button onclick="updateInterval()">Atualizar</button>
+                        <button onclick="updateInterval()"><i class="fas fa-sync-alt"></i> Atualizar</button>
                     </div>
                 </div>
 
@@ -397,7 +544,7 @@
                     <label for="youtubeLink">Link do YouTube:</label>
                     <input type="text" id="youtubeLink" placeholder="Cole o link do YouTube aqui"
                         onclick="clearLinkField()">
-                    <button onclick="loadYouTubeVideo()">Carregar Vídeo</button>
+                    <button onclick="loadYouTubeVideo()"><i class="fas fa-play"></i> Carregar Vídeo</button>
                 </div>
 
                 <div id="youtubePlayer">
@@ -419,16 +566,25 @@
     <!-- Nova seção de Texto para Áudio -->
     <div id="textToSpeechSection">
         <h2>Digite o texto para falar</h2>
-        <textarea id="text-input" placeholder="Digite o texto aqui..."></textarea>
-        <button onclick="textToSpeech()">Falar Texto</button>
-        <button onclick="saveText()">Salvar Texto</button>
-        <button onclick="toggleSavedTexts()">Textos Salvos</button>
-        <audio id="audio-output" controls></audio>
+
+        <!-- Nova div para centralizar o input -->
+        <div class="input-container">
+            <textarea id="text-input" placeholder="Digite o texto aqui..."></textarea>
+        </div>
+
+        <div class="controls">
+            <button onclick="textToSpeech()"><i class="fas fa-volume-up"></i> Falar Texto</button>
+            <button onclick="saveText()"><i class="fas fa-save"></i> Salvar Texto</button>
+            <button onclick="toggleSavedTexts()"><i class="fas fa-list"></i> Textos Salvos</button>
+            <audio id="audio-output" controls></audio>
+        </div>
+
         <div id="savedTextsSection">
             <h3>Textos Salvos</h3>
             <ul id="savedTextsList"></ul>
         </div>
     </div>
+
 
     <!-- Seção Separada para Áudios Personalizados -->
     <div id="customAudiosSection">
@@ -438,10 +594,16 @@
             <input type="text" id="customAudioTitle" placeholder="Digite o título do áudio">
             <label for="customAudioFile">Anexar Áudio:</label>
             <input type="file" id="customAudioFile" accept="audio/*">
-            <button onclick="saveCustomAudio()">Salvar Áudio</button>
+            <button onclick="saveCustomAudio()"><i class="fas fa-plus"></i> Salvar Áudio</button>
         </div>
         <div id="customAudiosList"></div>
     </div>
+
+
+    <footer>
+        <p>Desenvolvido Por © Genilson Ferreira</p>
+    </footer>
+
     <script src="/config.js"></script>
     <script src="https://www.youtube.com/iframe_api"></script>
     <script>
@@ -465,12 +627,18 @@
         let customAudios = [];
         let db;
         let isTextToSpeechPlaying = false;
+        let youtubeAPIReady = false;
 
         function loadYouTubeAPI() {
             const tag = document.createElement('script');
             tag.src = "https://www.youtube.com/iframe_api";
             const firstScriptTag = document.getElementsByTagName('script')[0];
             firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+        }
+
+        function onYouTubeIframeAPIReady() {
+            youtubeAPIReady = true;
+            initYouTubePlayer();
         }
 
         function initIndexedDB() {
@@ -551,19 +719,19 @@
                 const audioBox = document.createElement('div');
                 audioBox.className = 'custom-audio-box';
                 audioBox.innerHTML = `
-                <div class="custom-audio-title">${audio.title}</div>
-                <audio controls>
-                    <source src="${audio.audioData}" type="audio/mpeg">
-                    Seu navegador não suporta o elemento de áudio.
-                </audio>
-                <div class="custom-audio-controls">
-                    <button class="delete-audio" onclick="deleteCustomAudio(${audio.id})">Excluir</button>
-                </div>
-            `;
+            <div class="custom-audio-title">${audio.title}</div>
+            <audio controls>
+                <source src="${audio.audioData}" type="audio/mpeg">
+                Seu navegador não suporta o elemento de áudio.
+            </audio>
+            <div class="custom-audio-controls">
+                <button class="delete-audio" onclick="deleteCustomAudio(${audio.id})">Excluir</button>
+            </div>
+        `;
                 const audioElement = audioBox.querySelector('audio');
                 audioElement.addEventListener('play', () => {
                     if (youtubePlayer && youtubePlayer.getPlayerState() === YT.PlayerState.PLAYING) {
-                        youtubePlayer.setVolume(20);
+                        youtubePlayer.setVolume(5);
                     }
                 });
                 audioElement.addEventListener('pause', () => {
@@ -602,7 +770,6 @@
                 youtubeLinkInput.value = `https://www.youtube.com/watch?v=${savedVideoId}`;
             }
         }
-
 
         function saveState() {
             localStorage.setItem('interval', interval);
@@ -688,18 +855,25 @@
             const youtubeUrl = youtubeLinkInput.value;
             const videoId = extractVideoId(youtubeUrl);
             if (videoId) {
-                if (youtubePlayer) {
-                    youtubePlayer.loadVideoById(videoId);
+                if (youtubeAPIReady) {
+                    if (youtubePlayer) {
+                        youtubePlayer.loadVideoById(videoId);
+                    } else {
+                        createYouTubePlayer(videoId);
+                    }
+                    localStorage.setItem('youtubeVideoId', videoId);
                 } else {
-                    createYouTubePlayer(videoId);
+                    alert("A API do YouTube ainda não está pronta. Por favor, tente novamente em alguns segundos.");
                 }
-                localStorage.setItem('youtubeVideoId', videoId);
             } else {
                 showError('URL do YouTube inválida');
             }
         }
 
         function createYouTubePlayer(videoId) {
+            if (youtubePlayer) {
+                youtubePlayer.destroy();
+            }
             youtubePlayer = new YT.Player('youtubePlayer', {
                 height: '315',
                 width: '100%',
@@ -811,10 +985,6 @@
 
         setInterval(saveState, 1000);
 
-        function onYouTubeIframeAPIReady() {
-            initYouTubePlayer();
-        }
-        // Inicializar o player do YouTube quando a página carregar
         window.addEventListener('load', () => {
             loadYouTubeAPI();
             initIndexedDB();
@@ -823,6 +993,7 @@
             const checkYouTubeAPI = setInterval(() => {
                 if (typeof YT !== 'undefined' && YT.loaded) {
                     clearInterval(checkYouTubeAPI);
+                    youtubeAPIReady = true;
                     initYouTubePlayer();
                 }
             }, 100);
@@ -836,7 +1007,6 @@
             }, 10000);
         });
 
-        // Função para converter texto em áudio
         async function textToSpeech() {
             const apiKey = window.ENV.GOOGLE_API_KEY;
             const text = document.getElementById('text-input').value;
@@ -877,7 +1047,6 @@
                 }
             } catch (error) {
                 console.error('Erro:', error);
-
             }
         }
 
@@ -982,5 +1151,7 @@
         });
     </script>
 </body>
+
+</html>
 
 </html>
