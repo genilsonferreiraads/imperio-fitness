@@ -838,7 +838,7 @@
 
         // Função para converter texto em áudio
         async function textToSpeech() {
-            const apiKey = 'AIzaSyD1KBlpAV71woravSlYcbimE5Sk7q8b8Bw';
+            const apiKey = process.env.GOOGLE_API_KEY;
             const text = document.getElementById('text-input').value;
             const url = `https://texttospeech.googleapis.com/v1/text:synthesize?key=${apiKey}`;
 
