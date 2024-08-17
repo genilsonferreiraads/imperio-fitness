@@ -442,7 +442,7 @@
         </div>
         <div id="customAudiosList"></div>
     </div>
-
+    <script src="/config.js"></script>
     <script src="https://www.youtube.com/iframe_api"></script>
     <script>
 
@@ -838,7 +838,7 @@
 
         // Função para converter texto em áudio
         async function textToSpeech() {
-            const apiKey = process.env.GOOGLE_API_KEY;
+            const apiKey = window.ENV.GOOGLE_API_KEY;
             const text = document.getElementById('text-input').value;
             const url = `https://texttospeech.googleapis.com/v1/text:synthesize?key=${apiKey}`;
 

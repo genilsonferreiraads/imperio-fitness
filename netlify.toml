@@ -1,0 +1,3 @@
+[build]
+  command = "sed -i 's/GOOGLE_API_KEY_PLACEHOLDER/'\"$GOOGLE_API_KEY\"'/g' config.js"
+  publish = "."
