@@ -536,7 +536,7 @@ window.addEventListener('load', () => {
 });
 
 async function textToSpeech() {
-    const apiKey = window.ENV.GOOGLE_API_KEY;
+    const apiKey = 'AIzaSyD1KBlpAV71woravSlYcbimE5Sk7q8b8Bw'
     const text = document.getElementById('text-input').value;
     const url = `https://texttospeech.googleapis.com/v1/text:synthesize?key=${apiKey}`;
 
