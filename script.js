@@ -35,21 +35,6 @@ function toggleSidebar() {
     }
 }
 
-// Desabilitar botão direito
-document.addEventListener('contextmenu', function(e) {
-    e.preventDefault();
-});
-
-// Desabilitar teclas específicas
-document.addEventListener('keydown', function(e) {
-    if (e.ctrlKey && (e.key === 'u' || e.key === 'i' || e.key === 's')) {
-        e.preventDefault();
-    }
-});
-
-
-
-
 
 function initYouTubeAPI() {
     gapi.client.init({
