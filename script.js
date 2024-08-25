@@ -33,7 +33,22 @@ function toggleSidebar() {
     if (sidebar.classList.contains('open')) {
         loadRecentVideos();
     }
+    // Adicione esta linha para prevenir a propagação do evento
+    event.stopPropagation();
 }
+
+function closeSidebarOnClickOutside(event) {
+    const sidebar = document.getElementById('sidebar');
+    const sidebarButton = document.querySelector('button[onclick="toggleSidebar()"]');
+    
+    if (sidebar.classList.contains('open') && 
+        !sidebar.contains(event.target) && 
+        event.target !== sidebarButton) {
+        toggleSidebar();
+    }
+}
+
+
 
 
 function initYouTubeAPI() {
@@ -192,6 +207,46 @@ function initIndexedDB() {
         }
     };
 }
+
+// Função para verificar se o elemento é um campo de entrada permitido
+function isAllowedInput(element) {
+    return element.id === 'youtubeLink' || element.id === 'text-input';
+}
+
+// Desabilitar Botão Direito
+document.addEventListener('contextmenu', function(e) {
+    if (!isAllowedInput(e.target)) {
+        e.preventDefault();
+    }
+});
+
+// Desabilitar Teclas Específicas
+document.addEventListener('keydown', function(e) {
+    if (!isAllowedInput(e.target)) {
+        if (e.ctrlKey && (e.key === 'u' || e.key === 'i' || e.key === 's')) {
+            e.preventDefault();
+        }
+    }
+});
+
+// Desabilitar Inspeção de Elementos
+document.onkeydown = function(e) {
+    if (e.keyCode == 123) {
+        return false;
+    }
+    if (e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) {
+        return false;
+    }
+    if (e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) {
+        return false;
+    }
+    if (e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) {
+        return false;
+    }
+    if (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) {
+        return false;
+    }
+};
 
 function saveCustomAudio() {
     const title = document.getElementById('customAudioTitle').value;
@@ -650,6 +705,8 @@ function toggleSavedTexts() {
         savedTextsSection.style.display = 'none';
     }
 }
+
+document.addEventListener('click', closeSidebarOnClickOutside);
 
 
 
