@@ -6,7 +6,7 @@ const youtubeLinkInput = document.getElementById('youtubeLink');
 const youtubeOverlay = document.getElementById('youtubeOverlay');
 const customAudiosList = document.getElementById('customAudiosList');
 const textToSpeechAudio = document.getElementById('audio-output');
-let interval = parseInt(localStorage.getItem('interval')) || 120000;
+let interval = parseInt(localStorage.getItem('interval')) || 900000;
 let timeoutId;
 let countdownInterval;
 let remainingTime = parseInt(localStorage.getItem('remainingTime')) || interval;

@@ -4,10 +4,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="shortcut icon" href="imagens/Icon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="imagens/icon.ico" type="image/x-icon">
     <title>Império Fitness</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
     <style>
+
+
+    :root {
+        --cor-principal: #ecd071; /* Cor principal do site */
+        --cor-hover:#e1aa1e;/*cor hover site secundária*/
+    }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
@@ -22,30 +28,48 @@
         }
 
         .header {
-            cursor: pointer;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            background-color: #1e1e1e;
-            padding: 20px 0;
-            text-align: center;
-            z-index: 1000;
-        }
+    cursor: pointer;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: #1e1e1e;
+    padding: 20px 0;
+    display: flex; /* Define o layout como flexbox */
+    justify-content: center; /* Centraliza horizontalmente */
+    align-items: center; /* Centraliza verticalmente */
+    text-align: center;
+    z-index: 1000;
+}
 
         .header h1 {
-            color: #FF5500;
-            margin: 0;
-            font-size: 30px;
-            transition: transform 0.3s ease;
-        }
+    color: #ecd071; /* Cor do texto */
+    margin: 0; /* Remove margens */
+    font-size: 30px; /* Tamanho do texto */
+    font-family: 'Arial', sans-serif; /* Fonte personalizada */
+    display: flex; /* Flexbox para alinhar o texto e a imagem */
+    align-items: center; /* Alinha verticalmente o texto e a imagem */
+    gap: 10px; /* Espaçamento entre o texto e a imagem */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2); /* Sombra no texto */
+    transition: transform 0.3s ease, color 0.3s ease; /* Transições suaves */
+}
 
-        .header h1:hover {
-            transform: scale(1.04);
-        }
+.header h1:hover {
+    transform: scale(1.1); /* Ampliação suave no hover */
+    color: #d2b860; /* Cor do texto no hover */
+}
+
+.header-img {
+    width: 60px; /* Tamanho da imagem */
+    height: 60px; /* Tamanho proporcional */
+    /* Deixa a imagem circular */
+    transition: transform 0.3s ease; /* Efeito suave na imagem */
+}
+
+
 
         .container {
-            margin-top: 30px;
+            margin-top: 40px;
             display: flex;
             background-color: #1e1e1e;
             padding: 30px;
@@ -82,14 +106,14 @@
             text-align: center;
             margin-bottom: 20px;
             font-weight: bold;
-            color: #FF5500;
+            color: #ecd071;
         }
 
         .audio-title {
             font-size: 1.2em;
             font-weight: bold;
             margin-bottom: 10px;
-            color: #FF5500;
+            color: var(--cor-principal);
         }
 
         .audio-player {
@@ -120,7 +144,7 @@
         }
 
         .delete-text:hover {
-            color: #FF8C00;
+            color: var(--cor-principal);
         }
 
         .input-group {
@@ -158,7 +182,7 @@
         }
 
         button {
-            background-color: #FF5500;
+            background-color: var(--cor-principal);
             color: black;
             border: none;
             padding: 10px 15px;
@@ -168,7 +192,7 @@
         }
 
         button:hover {
-            background-color: #FF8C00;
+            background-color: var(--cor-hover);
         }
 
         #youtubePlayer {
@@ -204,7 +228,7 @@
 
         .sound-wave span {
             width: 10px;
-            background-color: #FF5500;
+            background-color: var(--cor-principal);
             animation: sound-wave 1.5s infinite ease-in-out;
         }
 
@@ -237,13 +261,13 @@
         }
 
         #errorMessage {
-            color: #FF5500;
+            color: var(--cor-principal);
             margin-top: 10px;
             text-align: center;
         }
 
         .Custom-audio-section-title {
-            color: #FF5500;
+            color: var(--cor-principal);
             font-size: 1.5em;
             margin-bottom: 15px;
             text-align: center;
@@ -308,7 +332,7 @@
             font-size: 1.2em;
             font-weight: bold;
             margin-bottom: 10px;
-            color: #FF5500;
+            color: var(--cor-principal);
         }
 
         .custom-audio-controls {
@@ -319,11 +343,11 @@
         }
 
         .delete-audio {
-            background-color: #FF5500;
+            background-color: var(--cor-principal);
         }
 
         .delete-audio:hover {
-            background-color: #FF8C00;
+            background-color: var(--cor-hover);
         }
 
         #textToSpeechSection {
@@ -348,7 +372,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            color: #FF5500;
+            color: var(--cor-principal);
             margin-bottom: 20px;
         }
 
@@ -426,7 +450,7 @@
         }
 
         footer p {
-            color: #FF5500;
+            color: var(--cor-principal);
             margin: 0;
             transition: transform 0.3s ease;
             cursor: pointer;
@@ -458,7 +482,7 @@
         .sidebar-header {
             padding: 20px;
             background-color: #2c2c2c;
-            color: #FF5500;
+            color: var(--cor-principal);
             font-size: 1.2em;
             font-weight: bold;
         }
@@ -569,8 +593,13 @@
 
 <body>
     <header class="header">
-        <h1>Academia Império Fitness</h1>
+        <h1>
+            Academia Império Fitness
+            <img src="imagens/Logo Site Império.png" alt="Logo da Academia" class="header-img">
+        </h1>
     </header>
+    
+    
 
     <div class="container">
         <div class="audio-video-section">
